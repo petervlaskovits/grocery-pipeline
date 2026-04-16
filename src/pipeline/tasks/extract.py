@@ -3,8 +3,8 @@ from prefect.blocks.system import Secret
 
 from pyspark.sql import SparkSession
 
-@task(retries=3, retry_delay_seconds=15, tags=["extract_tables"])
-def extract_table(table_name: str):
+@task(retries=3, retry_delay_seconds=15, tags=["extract"])
+async def extract_table(table_name: str):
     spark = SparkSession.builder.appName("Grocery Pipeline").getOrCreate()
     logger = get_run_logger()
     

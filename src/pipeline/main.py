@@ -2,7 +2,10 @@ from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession
 
 from tasks.extract import extract_table
-from tasks.transform.inventory import transform_inventory
+
+from tasks.transform.inventory import clean_inventory
+from tasks.transform.transactions import clean_transactions
+from tasks.transform.suppliers import clean_suppliers
 
 @flow
 def extract():
@@ -14,12 +17,23 @@ def extract():
     suppliers_df = future_suppliers.result()
     inventory_df = future_inventory.result()
 
-    return (transactions_df, suppliers_df, inventory_df)
+    return transactions_df, suppliers_df, inventory_df
 
 @flow
-def transform(transactions, suppliers, inventory):
-    cleaned_inventory = transform_inventory(inventory)
-    return cleaned_inventory
+def clean(transactions, suppliers, inventory):
+    future_clean_transactions = clean_transactions.submit(transactions)
+    future_clean_suppliers = clean_suppliers.submit(suppliers)
+    future_clean_inventory = clean_inventory.submit(inventory)
+
+    cleaned_transactions = future_clean_transactions.result()
+    cleaned_suppliers = future_clean_suppliers.result()
+    cleaned_inventory = future_clean_inventory.result()
+
+    return cleaned_transactions, cleaned_suppliers, cleaned_inventory
+
+@flow
+def transform():
+    pass
 
 @flow
 def load():
@@ -28,8 +42,8 @@ def load():
 @flow
 def pipeline():
     logger = get_run_logger()
-    dataframes = extract()
-    cleaned_inventory = transform(None, None, dataframes[2])
+    raw_transactions, raw_suppliers, raw_inventory = extract()
+    cleaned_transactions, cleaned_suppliers, cleaned_inventory = clean(None, None, raw_transactions)
     logger.info(cleaned_inventory.head(15))
 
 if __name__ == "__main__":

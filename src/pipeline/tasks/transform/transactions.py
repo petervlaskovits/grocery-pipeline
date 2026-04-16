@@ -1,5 +1,6 @@
-from pyspark.sql import SparkSession
-from pyspark.sql import Column
+from prefect import task
+from pyspark.sql import DataFrame
 
-def clean_customer_ids():
+@task(tags=['clean'])
+async def clean_transactions(raw_df: DataFrame):
     pass
