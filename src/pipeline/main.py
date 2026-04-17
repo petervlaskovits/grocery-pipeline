@@ -43,8 +43,9 @@ def load():
 def pipeline():
     logger = get_run_logger()
     raw_transactions, raw_suppliers, raw_inventory = extract()
-    cleaned_transactions, cleaned_suppliers, cleaned_inventory = clean(None, None, raw_transactions)
+    cleaned_transactions, cleaned_suppliers, cleaned_inventory = clean(raw_transactions, raw_suppliers, raw_inventory)
     logger.info(cleaned_inventory.head(15))
+    logger.info(cleaned_suppliers.head(15))
 
 if __name__ == "__main__":
     pipeline.serve(

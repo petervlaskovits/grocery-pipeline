@@ -1,14 +1,13 @@
 from prefect import task, get_run_logger
 from prefect.blocks.system import Secret
-
 from pyspark.sql import SparkSession
 
-@task(retries=3, retry_delay_seconds=15, tags=["extract"])
+@task(retries=0, retry_delay_seconds=0, tags=["extract"])
 async def extract_table(table_name: str):
     spark = SparkSession.builder.appName("Grocery Pipeline").getOrCreate()
     logger = get_run_logger()
     
-    login_credentials_block = Secret.load('retail-db-credentials')
+    login_credentials_block = await Secret.load('retail-db-credentials')
     login_credentials = login_credentials_block.get()
 
     transactions_df = spark.read.jdbc(
