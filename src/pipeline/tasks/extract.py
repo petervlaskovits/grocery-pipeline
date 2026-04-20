@@ -3,8 +3,7 @@ from prefect.blocks.system import Secret
 from pyspark.sql import SparkSession
 
 @task(retries=0, retry_delay_seconds=0, tags=["extract"])
-async def extract_table(table_name: str):
-    spark = SparkSession.builder.appName("Grocery Pipeline").getOrCreate()
+async def extract_table(spark, table_name: str):
     logger = get_run_logger()
     
     login_credentials_block = await Secret.load('retail-db-credentials')
