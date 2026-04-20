@@ -35,9 +35,7 @@ def load():
 
 @flow
 def pipeline():
-    spark = SparkSession.builder.appName("Grocery Pipeline") \
-    .config("spark.jars", "org.postgresql:postgresql:42.7.10") \
-    .getOrCreate()
+    spark = SparkSession.builder.appName("Grocery Pipeline").getOrCreate()
 
     logger = get_run_logger()
     raw_transactions, raw_suppliers, raw_inventory = extract(spark)
