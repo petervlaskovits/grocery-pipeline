@@ -9,5 +9,5 @@ def standardize_customers(raw_df: DataFrame):
     )
 
 @task(tags=['clean'])
-async def clean_transactions(raw_df: DataFrame):
+def clean_transactions(raw_df: DataFrame):
     return None

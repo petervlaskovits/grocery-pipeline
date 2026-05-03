@@ -14,7 +14,7 @@ def transform_quantity_recieved(raw_df: DataFrame):
     })
 
 @task(tags=['clean'])
-async def clean_suppliers(raw_df: DataFrame):
+def clean_suppliers(raw_df: DataFrame):
     pending = transform_quantity_recieved(raw_df)
     dates_transfomed = pending.withColumn({
             "order_date": try_to_timestamp(col("order_date")),
