@@ -39,7 +39,7 @@ def load():
 def pipeline():
     spark = (
         SparkSession.builder.appName("Grocery Pipeline")
-        .config("spark.jars", "file:///C:/spark/jars/postgresql-42.7.10.jar")
+        .config("spark.jars", "/home/peter/spark/jars/postgresql-42.7.10.jar")
         .getOrCreate()
     )
 
