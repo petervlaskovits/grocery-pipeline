@@ -1,29 +1,25 @@
 from prefect import task
-from pyspark.sql import DataFrame
-from pyspark.sql.types import LongType
-from pyspark.sql.functions import col, regexp_replace, try_to_timestamp, try_to_date
+from prefect.cache_policies import NO_CACHE
 
-from utils.cleaning import map_and_clean_column, category_map, store_location_map, flags_map
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.types import IntegerType
+from pyspark.sql.functions import col, upper, regexp_replace, try_to_timestamp
+from utils.cleaning import category_map, store_location_map, flags_map, assign_lookup_df, uppercase_columns_for_mapping
 
-def transform_quantity_recieved(raw_df: DataFrame):
-    return raw_df.withColumns({
-        "order_is_pending": raw_df["qty_received"].like("pending"), # worth including because we lose this data after it gets casted to a null 
-        "qty_received": regexp_replace(
-            col("qty_received"), r" units", ""
-        ).try_cast(LongType()),
-    })
-
-@task(tags=['clean'])
-def clean_suppliers(raw_df: DataFrame):
-    pending = transform_quantity_recieved(raw_df)
-    dates_transfomed = pending.withColumn({
-            "order_date": try_to_timestamp(col("order_date")),
-            "actual_delivery_date": try_to_timestamp(col("actual_delivery_date")),
-            "expected_delivery_date": try_to_date(col("expected_delivery_date"))
-        }
+@task(cache_policy=NO_CACHE)
+def clean_suppliers(raw_suppliers_df: DataFrame):
+    cleaned_qty_received = raw_suppliers_df.withColumn("qty_received", 
+        regexp_replace("qty_received", " units", "").try_cast(IntegerType())
     )
-    suppliers_cleaned = clean_suppliers(dates_transfomed)
-    categories_cleaned = map_and_clean_column(suppliers_cleaned, "category", category_map)
-    stores_cleaned = map_and_clean_column(categories_cleaned, "store_location", store_location_map)
-    suppliers_df = map_and_clean_column(stores_cleaned, "invoice_matched_flag", flags_map)
-    return suppliers_df
+
+    cleaned_order_date = cleaned_qty_received.withColumn("order_date", 
+        try_to_timestamp("order_date")
+    )
+
+    cleaned_flag = assign_lookup_df(cleaned_order_date, flags_map, "invoice_matched_flag")
+    uppered = uppercase_columns_for_mapping(cleaned_flag)
+
+    cleaned_categories = assign_lookup_df(uppered, category_map, "category")
+    cleaned_locations = assign_lookup_df(cleaned_categories, store_location_map, "store_location")
+
+    return cleaned_locations
