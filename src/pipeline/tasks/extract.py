@@ -22,19 +22,19 @@ def extract_table(table_name: str):
     login_credentials_block = Secret.load("retail-db-credentials")
     login_credentials = login_credentials_block.get()
 
-    df = spark.read.jdbc(
-        url="jdbc:postgresql://localhost:5432/retail",
-        table=table_name,
-        properties={
-            "user": login_credentials["user"],
-            "password": login_credentials["password"],
-        },
-    )
+    logger.info(f"Extracting table {table_name}")
 
     try:
-        logger.info(df.head(1))  # verify that we successfully loaded the DataFrame
+        df = spark.read.jdbc(
+            url="jdbc:postgresql://localhost:5432/retail",
+            table=table_name,
+            properties={
+                "user": login_credentials["user"],
+                "password": login_credentials["password"],
+            },
+        )
+        logger.info(f"Successfully extracted table {table_name}")
+        return df
     except Exception as e:
         logger.error(f"Failed to extract table {table_name}")
         raise Exception(e)
-
-    return df

@@ -15,9 +15,13 @@ def extract():
     list[DataFrame, DataFrame, DataFrame]: All of the original PostgreSQL tables in the following order: transactions, supplier_orders, and inventory.
 
     """
+    logger.info("Starting to extract all tables...")
+
     transactions_df = extract_table("transactions")
     suppliers_df = extract_table("supplier_orders")
     inventory_df = extract_table("inventory")
+
+    logger.info("Finished extracting all tables")
 
     return [transactions_df, suppliers_df, inventory_df]
 
@@ -34,12 +38,19 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     list[DataFrame, DataFrame, DataFrame]: All of the cleaned DataFrames in the following order: transactions, supplier_orders, and inventory.
     """
 
-    cleaned_suppliers = clean_suppliers(raw_dfs[1])
+    logger = get_run_logger()
+    logger.info("Beginning transformation process...")
+
+    cleaned_suppliers = clean_suppliers(raw_dfs[1])\
+
+    logger.info("Finished transformation process")
     return cleaned_suppliers
 
 
 @flow
 def pipeline():
+    logger.info("Pipeline started")
+
     spark = (
         SparkSession.builder.appName("Grocery Pipeline")
         .config("spark.jars", "/home/peter/spark/jars/postgresql-42.7.10.jar")
