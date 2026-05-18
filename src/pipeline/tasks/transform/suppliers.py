@@ -7,7 +7,9 @@ from pyspark.sql.functions import col, upper, regexp_replace, try_to_timestamp
 from utils.cleaning import category_map, store_location_map, flags_map, assign_lookup_df, uppercase_columns_for_mapping
 
 @task(cache_policy=NO_CACHE)
-def clean_suppliers(raw_suppliers_df: DataFrame):
+def clean_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
+    """
+    """
     cleaned_qty_received = raw_suppliers_df.withColumn("qty_received", 
         regexp_replace("qty_received", " units", "").try_cast(IntegerType())
     )
