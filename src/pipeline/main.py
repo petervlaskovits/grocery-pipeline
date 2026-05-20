@@ -2,9 +2,9 @@ from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession, DataFrame
 from tasks.extract import extract_table
 
-# from tasks.transform.inventory import clean_inventory
+from tasks.transform.inventory import clean_inventory
 from tasks.transform.suppliers import clean_suppliers
-# from tasks.transform.transactions import clean_transactions
+from tasks.transform.transactions import clean_transactions
 
 @flow
 def extract():
@@ -15,6 +15,9 @@ def extract():
     list[DataFrame, DataFrame, DataFrame]: All of the original PostgreSQL tables in the following order: transactions, supplier_orders, and inventory.
 
     """
+
+    logger = get_run_logger()
+
     logger.info("Starting to extract all tables...")
 
     transactions_df = extract_table("transactions")
@@ -41,14 +44,18 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     logger = get_run_logger()
     logger.info("Beginning transformation process...")
 
-    cleaned_suppliers = clean_suppliers(raw_dfs[1])\
+    cleaned_transactions = clean_transactions(raw_dfs[0])
+    cleaned_suppliers = clean_suppliers(raw_dfs[1])
+    cleaned_inventory = clean_inventory(raw_dfs[2])
 
     logger.info("Finished transformation process")
-    return cleaned_suppliers
+    return [cleaned_transactions, cleaned_suppliers, cleaned_inventory]
 
 
 @flow
 def pipeline():
+    logger = get_run_logger()
+
     logger.info("Pipeline started")
 
     spark = (
@@ -61,18 +68,15 @@ def pipeline():
         .getOrCreate()
     )
 
-    logger = get_run_logger()
     raw_dataframes = extract()
 
-    cleaned_suppliers = transform(raw_dataframes)
-    cleaned_suppliers.show()
+    cleaned_dfs = transform(raw_dataframes)
+    
+    cleaned_transactions = cleaned_dfs[0]
+    cleaned_suppliers = cleaned_dfs[1]
+    cleaned_inventory = cleaned_dfs[2]
 
     spark.stop()
 
-
 if __name__ == "__main__":
-    pipeline.serve(
-        name="grocery-pipeline",
-        # cron='0 6 * * 0',
-        version="1.0.0",
-    )
+    pipeline()

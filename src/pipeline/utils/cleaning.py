@@ -23,11 +23,13 @@ flags_map = [
     ("0", "FALSE"),
     ("NO", "FALSE"),
     ("No", "FALSE"),
+    ('no', "FALSE"),
     ("Y", "TRUE"),
     ("y", "TRUE"),
     ("1", "TRUE"),
     ("YES", "TRUE"),
-    ("Yes", "TRUE")
+    ("Yes", "TRUE"),
+    ('yes', "TRUE"),
 ]
 
 # All mappings to clean the category column.
@@ -60,7 +62,7 @@ def create_lookup_df(lookup_map: list) -> DataFrame:
     lookup_df = spark.createDataFrame(lookup_map, ["dirty", "clean"])
     return lookup_df
 
-def assign_lookup_df(original_df: DataFrame, lookup_map: list, column_name: str) -> DataFrame:
+def map_lookup_to_df(original_df: DataFrame, lookup_map: list, column_name: str) -> DataFrame:
     """
     Maps dirty values from the lookup DataFrame created by create_lookup_df to a DataFrame by left-joining the original DataFrame to the lookup DataFrame, then replaces the column to be mapped to with the mapped values using coalesce.
 
@@ -105,7 +107,6 @@ def uppercase_columns_for_mapping(original_df: DataFrame) -> DataFrame:
     else:
         return original_df.withColumns(
             {
-                'supplier_name': upper(col('supplier_name')),
                 'category':  upper(col('category')),
                 'store_id': upper(col('store_id'))
             }
