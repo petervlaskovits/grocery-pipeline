@@ -13,6 +13,7 @@ import json
 @task(cache_policy=NO_CACHE)
 def clean_inventory(raw_df: DataFrame) -> DataFrame:
     logger = get_run_logger()
+    logger.info("Transforming inventory table...")
 
     uppercased = uppercase_columns_for_mapping(raw_df)
     markdown_cleaned = map_lookup_to_df(uppercased, flags_map, 'markdown_flag')
@@ -32,6 +33,10 @@ def clean_inventory(raw_df: DataFrame) -> DataFrame:
     })
 
     validated, validation_errors = apply_schema(inventory_schema, cleaned)
-    logger.error(validation_errors)
+
+    if validation_errors != "{}":
+        logger.error(validation_errors)
+    else:
+        logger.info("Table successfully validated")
 
     return validated

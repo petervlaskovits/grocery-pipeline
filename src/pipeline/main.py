@@ -45,11 +45,11 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     logger.info("Beginning transformation process...")
 
     cleaned_transactions = clean_transactions(raw_dfs[0])
-    #cleaned_suppliers = clean_suppliers(raw_dfs[1])
-    #cleaned_inventory = clean_inventory(raw_dfs[2])
+    cleaned_suppliers = clean_suppliers(raw_dfs[1])
+    cleaned_inventory = clean_inventory(raw_dfs[2])
 
     logger.info("Finished transformation process")
-    return [cleaned_transactions]#, cleaned_suppliers, cleaned_inventory]
+    return [cleaned_transactions, cleaned_suppliers, cleaned_inventory]
 
 
 @flow
@@ -73,8 +73,8 @@ def pipeline():
     cleaned_dfs = transform(raw_dataframes)
     
     cleaned_transactions = cleaned_dfs[0]
-    #cleaned_suppliers = cleaned_dfs[1]
-    #cleaned_inventory = cleaned_dfs[2]
+    cleaned_suppliers = cleaned_dfs[1]
+    cleaned_inventory = cleaned_dfs[2]
 
     spark.stop()
 

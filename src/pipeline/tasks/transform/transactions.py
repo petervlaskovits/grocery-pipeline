@@ -33,6 +33,7 @@ def standardize_customer_ids(raw_df: DataFrame) -> DataFrame:
 @task(tags=['clean'], cache_policy=NO_CACHE)
 def clean_transactions(raw_df: DataFrame) -> DataFrame:
     logger = get_run_logger()
+    logger.info("Transforming transactions table...")
 
     cleaned_customers = standardize_customer_ids(raw_df)
     cleaned_payments = cleaned_customers.withColumn("payment_method",
@@ -68,6 +69,11 @@ def clean_transactions(raw_df: DataFrame) -> DataFrame:
     )
 
     validated, validation_errors = apply_schema(transactions_schema, cleaned_dates)
-    logger.error(validation_errors)
+    
+    if validation_errors != "{}":
+        logger.error(validation_errors)
+    else:
+        logger.info("Table successfully validated")
+
 
     return validated

@@ -11,6 +11,7 @@ store_location_map = [
     ("SOTH CORNER", "SOUTH CORNER"),
     ("NRTH PLAZA", "NORTH PLAZA"),
     ("NRTH MAIN ST", "NORTH MAIN ST"),
+    ("NRTH CORNER", "NORTH CORNER"),
     ("EAS PLAZA", "EAST PLAZA"),
     ("EAS MAIN ST", "EAST MAIN ST"),
     ("EAS CORNER", "EAST CORNER"),
