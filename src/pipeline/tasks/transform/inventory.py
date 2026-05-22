@@ -6,7 +6,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, when, try_to_date, try_to_timestamp
 
 from utils.cleaning import store_location_map, flags_map, category_map, uppercase_columns_for_mapping, map_lookup_to_df
-from utils.quality_checks import inventory_schema
+from utils.quality_checks import inventory_schema, apply_schema
 
 import json
 
@@ -31,10 +31,7 @@ def clean_inventory(raw_df: DataFrame) -> DataFrame:
         'last_restock_date': try_to_timestamp(col('last_restock_date'))
     })
 
-    validated = inventory_schema.validate(cleaned)
-    validation_errors = json.dumps(dict(validated.pandera.errors), indent=4)
-
-    if validation_errors != "{}":
-        logger.error(validation_errors)    
+    validated, validation_errors = apply_schema(inventory_schema, cleaned)
+    logger.error(validation_errors)
 
     return validated

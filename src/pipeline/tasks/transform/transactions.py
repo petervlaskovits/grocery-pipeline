@@ -1,9 +1,12 @@
 from prefect import task
 from prefect.cache_policies import NO_CACHE
+from prefect.logging import get_run_logger
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import regexp_replace, col, regexp_extract, format_string, upper, when, try_to_timestamp
+
 from utils.cleaning import store_location_map, flags_map, category_map, map_lookup_to_df, uppercase_columns_for_mapping
+from utils.quality_checks import transactions_schema, apply_schema
 
 def standardize_customer_ids(raw_df: DataFrame) -> DataFrame:
     """
@@ -29,6 +32,8 @@ def standardize_customer_ids(raw_df: DataFrame) -> DataFrame:
 
 @task(tags=['clean'], cache_policy=NO_CACHE)
 def clean_transactions(raw_df: DataFrame) -> DataFrame:
+    logger = get_run_logger()
+
     cleaned_customers = standardize_customer_ids(raw_df)
     cleaned_payments = cleaned_customers.withColumn("payment_method",
         upper(col("payment_method"))
@@ -62,4 +67,7 @@ def clean_transactions(raw_df: DataFrame) -> DataFrame:
         
     )
 
-    return consistent_returns
+    validated, validation_errors = apply_schema(transactions_schema, cleaned_dates)
+    logger.error(validation_errors)
+
+    return validated
