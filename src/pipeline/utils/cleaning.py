@@ -49,31 +49,29 @@ category_map = [
     ("FROZN", "FROZEN"),
 ]
 
-def create_lookup_df(lookup_map: list) -> DataFrame:
-    """
-    Creates a lookup DataFrame for Spark to apply mappings to messy values in order to clean a DataFrame.
+def create_lookup_df(lookup_map: list[tuple[str, str]]) -> DataFrame:
+    """Creates a lookup DataFrame for Spark to apply mappings to messy values in a DataFrame's column containing the messy values.
 
-    Parameters:
-    lookup_map: list: The lookup map, arranged as a list of tuples showing the messy data with its clean corresponding value (e.g ("TOBACO", "TOBACCO"))
+    Args:
+        lookup_map (list[tuple[str, str]]): The lookup map, a list of tuples containing messy data with a corresponding clean value (e.g. ("TOBACO", "TOBACCO"))
 
     Returns:
-    DataFrame: The lookup DataFrame with dirty values and clean values.
+        DataFrame: The lookup DataFrame with dirty values and clean values for a column.
     """
     spark = SparkSession.getActiveSession()
     lookup_df = spark.createDataFrame(lookup_map, ["dirty", "clean"])
     return lookup_df
 
-def map_lookup_to_df(original_df: DataFrame, lookup_map: list, column_name: str) -> DataFrame:
-    """
-    Maps dirty values from the lookup DataFrame created by create_lookup_df to a DataFrame by left-joining the original DataFrame to the lookup DataFrame, then replaces the column to be mapped to with the mapped values using coalesce.
+def map_lookup_to_df(original_df: DataFrame, lookup_map: list[tuple[str, str]], column_name: str) -> DataFrame:
+    """Maps dirty values from the lookup DataFrame to a DataFrame by left-joining the original DataFrame to the lookup DataFrame, then replaces the column to be mapped to with the mapped values using coalesce.
 
-    Parameters:
-    original_df: The DataFrame to be transformed using the lookup DataFrame.
-    lookup_map: The lookup map to be transformed into the lookup DataFrame to be used for mapping clean values to dirty vallues.
-    column_name: The column to be mapped to and transformed.
+    Args:
+        original_df (DataFrame): The DataFrame to be transformed using the lookup DataFrame.
+        lookup_map (list[tuple[str, str]]): The lookup map, a list of tuples containing messy data with a corresponding clean value (e.g. ("TOBACO", "TOBACCO"))
+        column_name (str): The column to be mapped to and transformed inside the DataFrame.
 
     Returns:
-    DataFrame: The cleaned DataFrame with all of the clean values mapped to the messy values.
+        DataFrame: The cleaned DataFrame with all of the clean values mapped to the messy values.
     """
     lookup_df = create_lookup_df(lookup_map)
     cleaned_df = original_df.join(
@@ -86,14 +84,13 @@ def map_lookup_to_df(original_df: DataFrame, lookup_map: list, column_name: str)
     return cleaned_df
 
 def uppercase_columns_for_mapping(original_df: DataFrame) -> DataFrame:
-    """
-    Converts several columns (supplier_name, category, store_location) to uppercase to make it easier to map clean values to messy values.
+    """Converts several columns (supplier_name, category, store_location) to uppercase, making it easier to map clean values to messy values by making the selected columns consistently in uppercase. 
 
-    Parameters:
-    original_df: The DataFrame to be transformed.
+    Args:
+        original_df (DataFrame): The DataFrame to be transformed
 
     Returns:
-    DataFrame: The transformed DataFrame with all three columns converted to uppercase.
+        DataFrame: The transformed DataFrame with all three columns converted to uppercase.
     """
     
     # One table (transactions) doesn't have store_location as a column (instead store_id), so we need to check if that column exists so that we can uppercase the store_location/store_id column  

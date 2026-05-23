@@ -8,12 +8,20 @@ from pyspark.sql.functions import col, when, try_to_date, try_to_timestamp
 from utils.cleaning import store_location_map, flags_map, category_map, uppercase_columns_for_mapping, map_lookup_to_df
 from utils.quality_checks import inventory_schema, apply_schema
 
-import json
-
 @task(cache_policy=NO_CACHE)
-def clean_inventory(raw_df: DataFrame) -> DataFrame:
+def clean_and_validate_inventory(raw_df: DataFrame) -> DataFrame:
+    """Cleans and validates the inventory DataFrame.
+
+    Args:
+        raw_df (DataFrame): The raw inventory DataFrame to be cleaned and validated.
+
+    Returns:
+        DataFrame: The cleaned and validated inventory DataFrame.
+    """
     logger = get_run_logger()
     logger.info("Transforming inventory table...")
+
+    before = raw_df.count()
 
     uppercased = uppercase_columns_for_mapping(raw_df)
     markdown_cleaned = map_lookup_to_df(uppercased, flags_map, 'markdown_flag')
@@ -34,9 +42,16 @@ def clean_inventory(raw_df: DataFrame) -> DataFrame:
 
     validated, validation_errors = apply_schema(inventory_schema, cleaned)
 
+    after = validated.count()
+
     if validation_errors != "{}":
         logger.error(validation_errors)
     else:
         logger.info("Table successfully validated")
+
+    logger.info({
+        "before_transform_row_count": before,
+        "after_transform_row_count": after
+    })
 
     return validated

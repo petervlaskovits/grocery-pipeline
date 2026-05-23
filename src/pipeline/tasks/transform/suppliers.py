@@ -10,19 +10,20 @@ from utils.cleaning import category_map, store_location_map, flags_map, map_look
 from utils.quality_checks import suppliers_schema, apply_schema
 
 @task(cache_policy=NO_CACHE)
-def clean_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
-    """
-    Cleans up the suppliers DataFrame to make it prepared for further data analysis.
+def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
+    """Cleans and validates the suppliers DataFrame.
 
-    Parameters:
-    raw_suppliers_df: The raw suppliers DataFrame.
+    Args:
+        raw_suppliers_df (DataFrame): The raw suppliers DataFrame to be cleaned and validated.
 
     Returns:
-    cleaned_suppliers: The cleaned suppliers DataFrame.
+        DataFrame: The cleand and validated suppliers DataFrame.
     """
 
     logger = get_run_logger()
     logger.info("Transforming suppliers table...")
+
+    before = raw_suppliers_df.count()
 
     cleaned_qty_received = raw_suppliers_df.withColumn("qty_received", 
         regexp_replace("qty_received", " units", "").try_cast(IntegerType())
@@ -42,10 +43,16 @@ def clean_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
 
     validated, validation_errors = apply_schema(suppliers_schema, cleaned_suppliers)
 
+    after = validated.count()
+
     if validation_errors != "{}":
         logger.error(validation_errors)
     else:
         logger.info("Table successfully validated")
 
+    logger.info({
+        "before_transform_row_count": before,
+        "after_transform_row_count": after
+    })
 
     return validated

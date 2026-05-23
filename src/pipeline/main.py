@@ -2,58 +2,59 @@ from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession, DataFrame
 from tasks.extract import extract_table
 
-from tasks.transform.inventory import clean_inventory
-from tasks.transform.suppliers import clean_suppliers
-from tasks.transform.transactions import clean_transactions
+from tasks.transform.inventory import clean_and_validate_inventory
+from tasks.transform.suppliers import clean_and_validate_suppliers
+from tasks.transform.transactions import clean_and_validate_transactions
 
 @flow
-def extract():
-    """
-    Extracts all of the PostgreSQL tables from the retail database using extract_table.
+def extract() -> list[DataFrame, DataFrame, DataFrame]:
+    """A subflow for the extract phase of the data pipeline. 
+    Extracts the transactions, supplier_orders, and inventory tables from a PostgreSQL database.
 
     Returns:
-    list[DataFrame, DataFrame, DataFrame]: All of the original PostgreSQL tables in the following order: transactions, supplier_orders, and inventory.
-
+        list[DataFrame, DataFrame, DataFrame]: A list of the raw DataFrames in the following order: raw_transactions_df, raw_suppliers_df, raw_inventory_df.
     """
 
     logger = get_run_logger()
 
     logger.info("Starting to extract all tables...")
 
-    transactions_df = extract_table("transactions")
-    suppliers_df = extract_table("supplier_orders")
-    inventory_df = extract_table("inventory")
+    raw_transactions_df = extract_table("transactions")
+    raw_suppliers_df = extract_table("supplier_orders")
+    raw_inventory_df = extract_table("inventory")
 
     logger.info("Finished extracting all tables")
 
-    return [transactions_df, suppliers_df, inventory_df]
+    return [raw_transactions_df, raw_suppliers_df, raw_inventory_df]
 
 
 @flow
 def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame, DataFrame, DataFrame]:
-    """
-    Transforms all raw DataFrames from the raw DataFrames list from extract with a task that appropriately transforms a single table based on what it is.
+    """A subflow for the transformation phase of the data pipeline. Runs table-specific transformation and validation tasks.
 
-    Parameters:
-    raw_dfs (list): The list of raw DataFrames from extract().
+    Args:
+        raw_dfs (list[DataFrame, DataFrame, DataFrame]): The list of raw DataFrames from the extract subflow.
 
     Returns:
-    list[DataFrame, DataFrame, DataFrame]: All of the cleaned DataFrames in the following order: transactions, supplier_orders, and inventory.
+        list[DataFrame, DataFrame, DataFrame]: A list of the transformed and validated DataFrames in the following order: cleaned_transactions_df, cleaned_suppliers_df, cleaned_inventory_df.
     """
 
     logger = get_run_logger()
     logger.info("Beginning transformation process...")
 
-    cleaned_transactions = clean_transactions(raw_dfs[0])
-    cleaned_suppliers = clean_suppliers(raw_dfs[1])
-    cleaned_inventory = clean_inventory(raw_dfs[2])
+    cleaned_transactions_df = clean_and_validate_transactions(raw_dfs[0])
+    cleaned_suppliers_df = clean_and_validate_suppliers(raw_dfs[1])
+    cleaned_inventory_df = clean_and_validate_inventory(raw_dfs[2])
 
     logger.info("Finished transformation process")
-    return [cleaned_transactions, cleaned_suppliers, cleaned_inventory]
+    return [cleaned_transactions_df, cleaned_suppliers_df, cleaned_inventory_df]
 
 
 @flow
 def pipeline():
+    """
+    The main pipeline flow. Extracts everything, transforms everything, and then loads it into an S3 bucket with Parquet files, where it will be used by Redshift.
+    """
     logger = get_run_logger()
 
     logger.info("Pipeline started")
@@ -72,9 +73,9 @@ def pipeline():
 
     cleaned_dfs = transform(raw_dataframes)
     
-    cleaned_transactions = cleaned_dfs[0]
-    cleaned_suppliers = cleaned_dfs[1]
-    cleaned_inventory = cleaned_dfs[2]
+    transactions = cleaned_dfs[0]
+    suppliers = cleaned_dfs[1]
+    inventory = cleaned_dfs[2]
 
     spark.stop()
 

@@ -9,14 +9,12 @@ from utils.cleaning import store_location_map, flags_map, category_map, map_look
 from utils.quality_checks import transactions_schema, apply_schema
 
 def standardize_customer_ids(raw_df: DataFrame) -> DataFrame:
-    """
-    Uses Regex to clean up and standardize customer IDs in the customer_id column.
-
-    Parameters:
-    raw_df: The DataFrame to be cleaned up, with the customer_id column.
+    """Uses Regex to clean up and standardize customer IDs from messy values to a consistent format (CUST-1234).
+    Args:
+        raw_df (DataFrame): The DataFrame that contains the customer_id column, to be cleaned up.
 
     Returns:
-    DataFrame: The cleaned DataFrame with the standardized customer IDs.
+        DataFrame: The cleaned DataFrame with the standardized customer IDs.
     """
 
     return raw_df.withColumn(
@@ -31,9 +29,19 @@ def standardize_customer_ids(raw_df: DataFrame) -> DataFrame:
     ).fillna("N/A", subset='customer_id')
 
 @task(tags=['clean'], cache_policy=NO_CACHE)
-def clean_transactions(raw_df: DataFrame) -> DataFrame:
+def clean_and_validate_transactions(raw_df: DataFrame) -> DataFrame:
+    """Cleans up and validates the transactions DataFrame.
+
+    Args:
+        raw_df (DataFrame): The raw transactions DataFrame to be cleaned up.
+
+    Returns:
+        DataFrame: The cleaned and validated transactions DataFrame.
+    """
     logger = get_run_logger()
     logger.info("Transforming transactions table...")
+
+    before = raw_df.count()
 
     cleaned_customers = standardize_customer_ids(raw_df)
     cleaned_payments = cleaned_customers.withColumn("payment_method",
@@ -69,11 +77,17 @@ def clean_transactions(raw_df: DataFrame) -> DataFrame:
     )
 
     validated, validation_errors = apply_schema(transactions_schema, cleaned_dates)
+    after = validated.count()
     
     if validation_errors != "{}":
         logger.error(validation_errors)
     else:
         logger.info("Table successfully validated")
 
+
+    logger.info(({
+        "before_transform_row_count": before,
+        "after_transform_row_count": after
+    }))
 
     return validated
