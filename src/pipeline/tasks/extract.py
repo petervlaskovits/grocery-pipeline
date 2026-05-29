@@ -1,5 +1,6 @@
 from prefect import get_run_logger, task
 from prefect.blocks.system import Secret
+
 from pyspark.sql import SparkSession, DataFrame
 
 
@@ -22,7 +23,7 @@ def extract_table(table_name: str) -> DataFrame:
 
     logger = get_run_logger()
 
-    login_credentials_block = Secret.load("retail-db-credentials")
+    login_credentials_block = Secret.load("db-creds")
     login_credentials = login_credentials_block.get()
 
     logger.info(f"Extracting table {table_name}")

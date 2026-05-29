@@ -1,5 +1,5 @@
 from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import col, coalesce, upper
+from pyspark.sql.functions import col, coalesce, upper, broadcast
 
 # All mappings to clean the store location column.
 store_location_map = [
@@ -75,7 +75,7 @@ def map_lookup_to_df(original_df: DataFrame, lookup_map: list[tuple[str, str]], 
     """
     lookup_df = create_lookup_df(lookup_map)
     cleaned_df = original_df.join(
-        lookup_df, original_df[column_name] == lookup_df["dirty"],
+        broadcast(lookup_df), original_df[column_name] == lookup_df["dirty"], # Memory optimization, originally Spark's memory manager complained that I exceeded 95% of its memory allocation after I wrote the load logic, then I added this in to optimize the pipeline.
         how='left'
     ).withColumn(
         column_name, 

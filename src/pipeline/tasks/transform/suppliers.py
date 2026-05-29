@@ -41,6 +41,7 @@ def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
     cleaned_categories = map_lookup_to_df(uppered, category_map, "category")
     cleaned_suppliers = map_lookup_to_df(cleaned_categories, store_location_map, "store_location")
 
+    logger.info("Finished transformations, validating suppliers table...")
     validated, validation_errors = apply_schema(suppliers_schema, cleaned_suppliers)
 
     after = validated.count()

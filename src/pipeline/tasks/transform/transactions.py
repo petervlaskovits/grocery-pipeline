@@ -76,6 +76,7 @@ def clean_and_validate_transactions(raw_df: DataFrame) -> DataFrame:
         
     )
 
+    logger.info("Finished transformations, validating transactions table...")
     validated, validation_errors = apply_schema(transactions_schema, cleaned_dates)
     after = validated.count()
     

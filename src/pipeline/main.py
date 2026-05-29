@@ -1,10 +1,15 @@
 from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession, DataFrame
+
 from tasks.extract import extract_table
 
 from tasks.transform.inventory import clean_and_validate_inventory
 from tasks.transform.suppliers import clean_and_validate_suppliers
 from tasks.transform.transactions import clean_and_validate_transactions
+
+from tasks.load import load_dataframe_to_s3
+
+import time
 
 @flow
 def extract() -> list[DataFrame, DataFrame, DataFrame]:
@@ -49,6 +54,12 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     logger.info("Finished transformation process")
     return [cleaned_transactions_df, cleaned_suppliers_df, cleaned_inventory_df]
 
+@flow
+def load(validated_dfs: list[DataFrame, DataFrame, DataFrame]):
+    for df in validated_dfs:
+        load_dataframe_to_s3(df)
+        time.sleep(10) # Cooldown period to not overwhelm API
+
 
 @flow
 def pipeline():
@@ -61,10 +72,12 @@ def pipeline():
 
     spark = (
         SparkSession.builder.appName("Grocery Pipeline")
-        .config("spark.jars", "/home/peter/spark/jars/postgresql-42.7.10.jar")
+        .config("spark.jars", 
+        "/home/peter/spark/jars/postgresql-42.7.10.jar",
+        )
         .config(
             "spark.driver.extraClassPath",
-            "/home/peter/spark/jars/postgresql-42.7.10.jar",
+            "/home/peter/spark/jars/postgresql-42.7.10.jar"
         )
         .getOrCreate()
     )
@@ -73,9 +86,7 @@ def pipeline():
 
     cleaned_dfs = transform(raw_dataframes)
     
-    transactions = cleaned_dfs[0]
-    suppliers = cleaned_dfs[1]
-    inventory = cleaned_dfs[2]
+    load(cleaned_dfs)
 
     spark.stop()
 

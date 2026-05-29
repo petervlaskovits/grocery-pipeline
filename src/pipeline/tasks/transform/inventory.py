@@ -40,6 +40,7 @@ def clean_and_validate_inventory(raw_df: DataFrame) -> DataFrame:
         'last_restock_date': try_to_timestamp(col('last_restock_date'))
     })
 
+    logger.info("Finished transformations, validating inventory table...")
     validated, validation_errors = apply_schema(inventory_schema, cleaned)
 
     after = validated.count()

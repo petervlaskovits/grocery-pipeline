@@ -9,7 +9,5 @@ wheels/
 # Virtual environments
 .venv
 
-# Secrets
-.env
-
-src/test.py
+# Pipeline-related stuff
+src/pipeline/tmp
