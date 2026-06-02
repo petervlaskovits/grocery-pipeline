@@ -46,6 +46,9 @@ def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
 
     after = validated.count()
 
+    if before != after:
+        logger.warn("Imbalanced row counts for inventory table after transformation!")
+
     if validation_errors != "{}":
         logger.error(validation_errors)
     else:

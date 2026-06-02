@@ -67,7 +67,11 @@ def clean_and_validate_transactions(raw_df: DataFrame) -> DataFrame:
         }
     ).withColumn("quantity_sold",
         when(
-            (col("return_flag") == "FALSE") & (col("quantity_sold") <= 0), -1 * col("quantity_sold")).otherwise(col("quantity_sold"))
+                (col("return_flag") == "FALSE") & (col("quantity_sold") <= 0), 
+                -1 * col("quantity_sold")
+            )
+            .otherwise(col("quantity_sold")
+        )
     )
 
     cleaned_dates = consistent_returns.withColumn(
@@ -79,6 +83,9 @@ def clean_and_validate_transactions(raw_df: DataFrame) -> DataFrame:
     logger.info("Finished transformations, validating transactions table...")
     validated, validation_errors = apply_schema(transactions_schema, cleaned_dates)
     after = validated.count()
+
+    if before != after:
+        logger.warn("Imbalanced row counts for inventory table after transformation!")
     
     if validation_errors != "{}":
         logger.error(validation_errors)

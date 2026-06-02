@@ -48,11 +48,12 @@ def load_dataframe_to_s3(df: DataFrame) -> None:
         for file in files:
             local_path = os.path.join(root, file)
             s3_key = f"data/{df_name}/{file}"
-            try:
-                s3.upload_file(local_path, s3_bucket_name, s3_key)
-            except Exception as e:
-                logger.error(f"Failed to upload {file} to S3 bucket")
-                raise e
+            if local_path.endswith(".parquet"):
+                try:
+                    s3.upload_file(local_path, s3_bucket_name, s3_key)
+                except Exception as e:
+                    logger.error(f"Failed to upload {file} to S3 bucket")
+                    raise e
         
             time.sleep(5) 
 

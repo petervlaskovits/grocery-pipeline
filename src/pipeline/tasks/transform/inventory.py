@@ -50,6 +50,10 @@ def clean_and_validate_inventory(raw_df: DataFrame) -> DataFrame:
     else:
         logger.info("Table successfully validated")
 
+
+    if before != after:
+        logger.warn("Imbalanced row counts for inventory table after transformation!")
+
     logger.info({
         "before_transform_row_count": before,
         "after_transform_row_count": after
