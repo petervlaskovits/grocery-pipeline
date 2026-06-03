@@ -41,4 +41,4 @@ def extract_table(table_name: str) -> DataFrame:
         return df
     except Exception as e: # might be a terrible idea, but at the same time I can't just keep the entire pipeline running when accessing one table fails...
         logger.error(f"Failed to extract table {table_name}")
-        raise Exception(e)
+        raise e

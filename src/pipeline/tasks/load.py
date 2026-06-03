@@ -10,11 +10,12 @@ import os
 import time
 
 @task(cache_policy=NO_CACHE)
-def load_dataframe_to_s3(df: DataFrame) -> None:
+def load_dataframe_to_s3(df: DataFrame, df_name: str) -> None:
     """Loads a single DataFrame into an S3 bucket by turning a DataFrame into a collection of Parquet files on the local disk, then uploads each individual file into an S3 bucket. 
 
     Args:
         df (DataFrame): The DataFrame to be uploaded to S3.
+        df_name (str): The name of the DataFrame that will be used for the S3 folder where the partitions for that DataFrame will be stored in. 
     """
 
     logger = get_run_logger()
@@ -26,13 +27,6 @@ def load_dataframe_to_s3(df: DataFrame) -> None:
     aws_creds = aws_creds_block.get()
 
     s3 = boto3.client("s3", aws_access_key_id=aws_creds["access_key"], aws_secret_access_key=aws_creds["secret_key"])
-
-    df_name = "inventory"
-
-    if "order_id" in df.columns:
-        df_name = "suppliers"
-    elif "transaction_id" in df.columns:
-        df_name = "transactions"
 
     path = f"tmp/{df_name}"
 
@@ -47,7 +41,7 @@ def load_dataframe_to_s3(df: DataFrame) -> None:
     for root, dirs, files in os.walk(path):
         for file in files:
             local_path = os.path.join(root, file)
-            s3_key = f"data/{df_name}/{file}"
+            s3_key = f"data/{df_name}/{df_name}.snappy.parquet"
             if local_path.endswith(".parquet"):
                 try:
                     s3.upload_file(local_path, s3_bucket_name, s3_key)

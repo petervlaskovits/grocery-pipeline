@@ -56,9 +56,10 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
 
 @flow
 def load(validated_dfs: list[DataFrame, DataFrame, DataFrame]):
-    for df in validated_dfs:
-        load_dataframe_to_s3(df)
-        time.sleep(10) # Cooldown period to not overwhelm API
+    """A subflow for the load phase of the data pipeline. Just loads Parquet partitions to an S3 bucket folder specific to each table."""
+    load_dataframe_to_s3(validated_dfs[0], "transactions")
+    load_dataframe_to_s3(validated_dfs[1], "suppliers")
+    load_dataframe_to_s3(validated_dfs[2], "inventory")
 
 
 @flow
