@@ -19,18 +19,18 @@ store_location_map = [
 
 # All mappings to clean any flag column.
 flags_map = [
-    ("N", "FALSE"),
-    ("n", "FALSE"),
-    ("0", "FALSE"),
-    ("NO", "FALSE"),
-    ("No", "FALSE"),
-    ('no', "FALSE"),
-    ("Y", "TRUE"),
-    ("y", "TRUE"),
-    ("1", "TRUE"),
-    ("YES", "TRUE"),
-    ("Yes", "TRUE"),
-    ('yes', "TRUE"),
+    ("N", False),
+    ("n", False),
+    ("0", False),
+    ("NO", False),
+    ("No", False),
+    ('no', False),
+    ("Y", True),
+    ("y", True),
+    ("1", True),
+    ("YES", True),
+    ("Yes", True),
+    ('yes', True),
 ]
 
 # All mappings to clean the category column.
