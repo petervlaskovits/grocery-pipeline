@@ -32,7 +32,7 @@ shared_columns = {
     ),
     'flag': pa.Column(
         str, 
-        pa.Check.isin(allowed_values=["TRUE", "FALSE"])
+        pa.Check.isin(allowed_values=[True, False])
     ),
     'unit_cost_usd': pa.Column(
         DecimalType(10, 2), 
