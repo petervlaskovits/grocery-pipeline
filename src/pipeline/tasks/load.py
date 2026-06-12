@@ -47,7 +47,7 @@ def load_dataframe_to_s3(df: DataFrame, df_name: str) -> None:
                     s3.upload_file(local_path, s3_bucket_name, s3_key)
                 except Exception as e:
                     logger.error(f"Failed to upload {file} to S3 bucket")
-                    raise e
+                    raise e # The pipeline is pretty much finished; plus, if this happens, we can have someone manually upload the Parquet files to S3 if the pipeline couldn't do it as a last resort...
         
             time.sleep(5) 
 

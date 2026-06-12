@@ -92,4 +92,8 @@ def pipeline():
     spark.stop()
 
 if __name__ == "__main__":
-    pipeline()
+    pipeline.deploy(
+        name="grocery-store-analytics-pipeline",
+        cron="0 8 * * 5",
+        version="1.0.0"
+    )
