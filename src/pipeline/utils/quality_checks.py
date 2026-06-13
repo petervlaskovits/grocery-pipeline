@@ -27,8 +27,7 @@ shared_columns = {
         )
     ),
     'supplier_name': pa.Column(
-        str, 
-        pa.Check.str_matches(r"[A-Z\s]{12,22}") # In case we get a new supplier in the DB
+        str    
     ),
     'flag': pa.Column(
         str, 
