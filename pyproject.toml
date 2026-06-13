@@ -1,7 +1,7 @@
 [project]
-name = "serious-grocery-pipeline"
+name = "grocery-pipeline"
 version = "1.0.0"
-description = "Add your description here"
+description = "An ETL pipeline powering analytics for a fictional grocery store chain using mock data"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
