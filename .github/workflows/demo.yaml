@@ -24,4 +24,4 @@ jobs:
         run: uv sync
 
       - name: Test PostgreSQL
-        run: psql 'SELECT 1;'
+        run: psql -c 'SELECT 1;'
