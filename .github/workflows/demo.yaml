@@ -18,7 +18,7 @@ jobs:
           python-version-file: '.python-version'
 
       - name: Install PostgreSQL
-        uses: bmizerany/setup-postgres@v3
+        uses: bmizerany/setup-postgres@v4
 
       - name: Install Project
         run: uv sync
