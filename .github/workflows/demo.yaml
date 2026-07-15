@@ -24,7 +24,9 @@ jobs:
         run: uv sync
 
       - name: Initialize Fixtures
-        run: psql -h localhost -U postgres -d retail -f tests/fixtures/retail_db_test.sql
+        run: | 
+          createdb retail 
+          psql -h localhost -U postgres -d retail -f tests/fixtures/retail_db_test.sql
       
       - name: Run Tests
         run: uv run pytest
