@@ -16,6 +16,7 @@ dependencies = [
     "psycopg2-binary>=2.9.12",
     "pyarrow>=23.0.1",
     "pyspark>=4.1.1",
+    "pytest>=9.1.1",
     "seaborn>=0.13.2",
     "sqlalchemy>=2.0.47",
 ]

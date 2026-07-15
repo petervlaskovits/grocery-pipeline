@@ -979,6 +979,45 @@ wheels = [
 ]
 
 [[package]]
+name = "grocery-pipeline"
+version = "1.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "boto3" },
+    { name = "dotenv" },
+    { name = "fastexcel" },
+    { name = "ipykernel" },
+    { name = "pandas" },
+    { name = "pandera", extra = ["pandas", "pyspark"] },
+    { name = "polars" },
+    { name = "prefect", extra = ["aws", "sqlalchemy"] },
+    { name = "psycopg2-binary" },
+    { name = "pyarrow" },
+    { name = "pyspark" },
+    { name = "pytest" },
+    { name = "seaborn" },
+    { name = "sqlalchemy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "boto3", specifier = ">=1.43.14" },
+    { name = "dotenv", specifier = ">=0.9.9" },
+    { name = "fastexcel", specifier = ">=0.19.0" },
+    { name = "ipykernel", specifier = ">=7.2.0" },
+    { name = "pandas", specifier = ">=2.2,<3.0" },
+    { name = "pandera", extras = ["pandas", "pyspark"], specifier = ">=0.31.1" },
+    { name = "polars", specifier = ">=1.38.1" },
+    { name = "prefect", extras = ["aws", "sqlalchemy"], specifier = ">=3.7.2" },
+    { name = "psycopg2-binary", specifier = ">=2.9.12" },
+    { name = "pyarrow", specifier = ">=23.0.1" },
+    { name = "pyspark", specifier = ">=4.1.1" },
+    { name = "pytest", specifier = ">=9.1.1" },
+    { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "sqlalchemy", specifier = ">=2.0.47" },
+]
+
+[[package]]
 name = "grpcio"
 version = "1.80.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1132,6 +1171,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b9/28/99c51f664567218d824af024c0251650fb27e4ca066df188dab0769c5b91/idna-3.17.tar.gz", hash = "sha256:5eb0cb53bc467c12eadcf6de83163ad8527cec9416f44b9b61b19caedad2b87f", size = 196048, upload-time = "2026-05-28T14:32:38.55Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/a7/f76514cc40ad6234098ecdebda08732d75964776c51a42845b7da10649e2/idna-3.17-py3-none-any.whl", hash = "sha256:466e48829084efe2548012b855df21540b96f2e20e51bd124c851536556a592c", size = 65316, upload-time = "2026-05-28T14:32:37.035Z" },
+]
+
+[[package]]
+name = "iniconfig"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/34/14ca021ce8e5dfedc35312d08ba8bf51fdd999c576889fc2c24cb97f4f10/iniconfig-2.3.0.tar.gz", hash = "sha256:c76315c77db068650d49c5b56314774a7804df16fee4402c1f19d6d15d8c4730", size = 20503, upload-time = "2025-10-18T21:55:43.219Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/b1/3846dd7f199d53cb17f49cba7e651e9ce294d8497c8c150530ed11865bb8/iniconfig-2.3.0-py3-none-any.whl", hash = "sha256:f631c04d2c48c52b84d0d0549c99ff3859c98df65b3101406327ecc7d53fbf12", size = 7484, upload-time = "2025-10-18T21:55:41.639Z" },
 ]
 
 [[package]]
@@ -2671,6 +2719,22 @@ connect = [
 ]
 
 [[package]]
+name = "pytest"
+version = "9.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "iniconfig" },
+    { name = "packaging" },
+    { name = "pluggy" },
+    { name = "pygments" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -3285,43 +3349,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/72/d1/d3159231aec234a59dd7d601e9dd9fe96f3afff15efd33c1070019b26132/semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602", size = 269730, upload-time = "2025-01-24T13:19:27.617Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a6/24/4d91e05817e92e3a61c8a21e08fd0f390f5301f1c448b137c57c4bc6e543/semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746", size = 17912, upload-time = "2025-01-24T13:19:24.949Z" },
-]
-
-[[package]]
-name = "serious-grocery-pipeline"
-version = "1.0.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "boto3" },
-    { name = "dotenv" },
-    { name = "fastexcel" },
-    { name = "ipykernel" },
-    { name = "pandas" },
-    { name = "pandera", extra = ["pandas", "pyspark"] },
-    { name = "polars" },
-    { name = "prefect", extra = ["aws", "sqlalchemy"] },
-    { name = "psycopg2-binary" },
-    { name = "pyarrow" },
-    { name = "pyspark" },
-    { name = "seaborn" },
-    { name = "sqlalchemy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "boto3", specifier = ">=1.43.14" },
-    { name = "dotenv", specifier = ">=0.9.9" },
-    { name = "fastexcel", specifier = ">=0.19.0" },
-    { name = "ipykernel", specifier = ">=7.2.0" },
-    { name = "pandas", specifier = ">=2.2,<3.0" },
-    { name = "pandera", extras = ["pandas", "pyspark"], specifier = ">=0.31.1" },
-    { name = "polars", specifier = ">=1.38.1" },
-    { name = "prefect", extras = ["aws", "sqlalchemy"], specifier = ">=3.7.2" },
-    { name = "psycopg2-binary", specifier = ">=2.9.12" },
-    { name = "pyarrow", specifier = ">=23.0.1" },
-    { name = "pyspark", specifier = ">=4.1.1" },
-    { name = "seaborn", specifier = ">=0.13.2" },
-    { name = "sqlalchemy", specifier = ">=2.0.47" },
 ]
 
 [[package]]

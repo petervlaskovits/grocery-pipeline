@@ -23,5 +23,8 @@ jobs:
       - name: Install Project
         run: uv sync
 
-      - name: Test PostgreSQL
-        run: psql -c 'SELECT 1;'
+      - name: Initialize Fixtures
+        run: psql -h localhost -U retail -d retail -f tests/fixtures/retail_db_test.sql
+      
+      - name: Run Tests
+        run: uv run pytest
