@@ -11,6 +11,7 @@ You can check out the dashboard [here](https://peter-v-grocery-dashboard-project
 * Transformation layer - Spark/PySpark
 * Data validation - Pandera
 * Dashboard - Streamlit
+* Data warehouse - AWS Redshift
 
 ## Architecture Discussion
 
