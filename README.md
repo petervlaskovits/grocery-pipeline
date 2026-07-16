@@ -11,6 +11,7 @@ You can check out the dashboard [here](https://peter-v-grocery-dashboard-project
 * Transformation layer - Spark/PySpark
 * Data validation - Pandera
 * Dashboard - Streamlit
+* Data warehouse - AWS Redshift
 
 ## Architecture Discussion
 
@@ -24,7 +25,7 @@ I opted to use Spark for the transformation/cleaning layer instead of Pandas or 
 
 After all of the data is cleaned, I used Pandera to validate all of the data in accordance to a schema defined by myself. This would eventually be used for CI/CD to test out any changes to the pipeline; however, since I was on a tight time constraint to finish up this project, I opted to not include it in the initial release of this project. That being said I plan on implementing CI/CD later.
 
-Once the data is validated, all of the cleaned tables are loaded locally as Parquet files to be uploaded into an S3 bucket, where it will be used for a Redshift warehouse. Initially, I tried using it natively by using AWS-specific JARs, however, it was incredibly tough to deal with, and I opted to just load the Parquet files locally and upload them into the S3 bucket. One limitation is that if the loading operation fails, then someone would have to manually upload the data into S3. If this project were to scale I would maybe create a loading "backfill" script that goes through the uploaded files and loads them into S3 if the data fails to be uploaded into S3 after a certain amount of time; I'll definitely have to research more into this topic to see what I should do in this situation.
+Once the data is validated, all of the cleaned tables are loaded locally as Parquet files to be uploaded into an S3 bucket, where it will be used for a Redshift warehouse. Initially, I tried using it natively by using AWS-specific JARs, however, it was incredibly tough to deal with, and I opted to just load the Parquet files locally and upload them into the S3 bucket. One limitation is that if the loading operation fails, then someone would have to manually upload the data into S3. If this project were to scale I would maybe create a loading "backfill" script that goes through the uploaded files and loads them into S3 if the data fails to be uploaded into S3 after a certain amount of time; I'll definitely have to research more into this topic to see what I should do in this situation. Another bottleneck that would likely occur if the data volume increases is the lack of partitioning in the Parquet files being uploaded to S3; it would slow the pipeline down significantly trying to upload all 10 million rows in a certain table all at once. To ensure the pipeline runs smoothly I would probably partition the tables by date per year because it may be used heavily by data analysts when working with analyticaly queries, but that would mean I would have to figure something out dealing with partitioned files and loading them to Redshift.
 
 ### Warehouse Data Model
 ![Redshift Data Model](img/Data%20Model.png)
