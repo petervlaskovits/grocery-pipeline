@@ -5,9 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
 
 # Virtual environments
 .venv
 
-# Pipeline-related stuff
-src/pipeline/tmp
+# pipeline log files
+src/pipeline/tmp/

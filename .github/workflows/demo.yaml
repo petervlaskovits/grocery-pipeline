@@ -3,7 +3,20 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v7
 
@@ -17,16 +30,11 @@ jobs:
         with:
           python-version-file: '.python-version'
 
-      - name: Install PostgreSQL
-        uses: bmizerany/setup-postgres@v4
-
       - name: Install Project
-        run: uv sync
+        run: uv sync --locked --all-extras --dev
 
-      - name: Initialize Fixtures
-        run: | 
-          createdb retail 
-          psql -h localhost -U postgres -d retail -f tests/fixtures/retail_db_test.sql
+      - name: Initialize PostgreSQL fixture
+        run: uv run python tests/fixtures/generate_fixture.py
       
       - name: Run Tests
         run: uv run pytest
