@@ -21,14 +21,14 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: "Setup Python"
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v7
         with:
           python-version-file: '.python-version'
       
       - name: "Setup Java"
         uses: actions/setup-java@v5
         with: 
-          distribution: adopt
+          distribution: temurin
           java-version: '17'
       
       - name: Install uv
