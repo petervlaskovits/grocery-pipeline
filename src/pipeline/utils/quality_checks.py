@@ -30,8 +30,7 @@ shared_columns = {
         str    
     ),
     'flag': pa.Column(
-        str, 
-        pa.Check.isin(allowed_values=[True, False])
+        bool    
     ),
     'unit_cost_usd': pa.Column(
         DecimalType(10, 2), 
@@ -79,7 +78,7 @@ inventory_schema = pa.DataFrameSchema(
             nullable=True
         ),
         'markdown_flag': shared_columns['flag']
-    }
+    }, strict=True
 )
 
 # Suppliers table specific schema
@@ -119,7 +118,8 @@ suppliers_schema = pa.DataFrameSchema({
         pa.Check.in_range(0, 100, True, True)
     ),
     'invoice_matched_flag': shared_columns['flag']
-})
+}, strict=True
+)
 
 # Transactions table specific schema
 transactions_schema = pa.DataFrameSchema({
@@ -165,7 +165,8 @@ transactions_schema = pa.DataFrameSchema({
         DecimalType(10, 2)
     ),
     'return_flag': shared_columns['flag']
-})
+}, strict=True
+)
 
 def apply_schema(schema: pa.DataFrameSchema, df: DataFrame) -> [DataFrame, str]:
     """Applies a Pandera DataFrame schema to a DataFrame for table validation.
