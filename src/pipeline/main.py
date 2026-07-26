@@ -1,13 +1,13 @@
 from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession, DataFrame
 
-from tasks.extract import extract_table
+from pipeline.tasks.extract import extract_table
 
-from tasks.transform.inventory import clean_and_validate_inventory
-from tasks.transform.suppliers import clean_and_validate_suppliers
-from tasks.transform.transactions import clean_and_validate_transactions
+from pipeline.tasks.transform.inventory import clean_and_validate_inventory
+from pipeline.tasks.transform.suppliers import clean_and_validate_suppliers
+from pipeline.tasks.transform.transactions import clean_and_validate_transactions
 
-from tasks.load import load_dataframe_to_s3
+from pipeline.tasks.load import load_dataframe_to_s3
 
 import time
 

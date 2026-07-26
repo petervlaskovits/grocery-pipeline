@@ -1,4 +1,4 @@
-from src.pipeline.utils import cleaning
+from pipeline.utils import cleaning
 from pyspark.sql import SparkSession
 
 def test_store_mappings(spark):

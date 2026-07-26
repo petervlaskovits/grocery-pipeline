@@ -6,8 +6,8 @@ from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.types import IntegerType
 from pyspark.sql.functions import col, upper, regexp_replace, try_to_date, try_to_timestamp
 
-from utils.cleaning import category_map, store_location_map, flags_map, map_lookup_to_df, uppercase_columns_for_mapping
-from utils.quality_checks import suppliers_schema, apply_schema
+from pipeline.utils.cleaning import category_map, store_location_map, flags_map, map_lookup_to_df, uppercase_columns_for_mapping
+from pipeline.utils.quality_checks import suppliers_schema, apply_schema
 
 @task(cache_policy=NO_CACHE)
 def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:

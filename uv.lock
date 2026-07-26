@@ -981,7 +981,7 @@ wheels = [
 [[package]]
 name = "grocery-pipeline"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "boto3" },
     { name = "dotenv" },

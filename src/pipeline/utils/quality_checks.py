@@ -3,7 +3,7 @@ import pandera.pyspark as pa
 from pyspark.sql import DataFrame
 from pyspark.sql.types import DecimalType, DateType, TimestampType
 
-from utils.cleaning import store_location_map, category_map
+from pipeline.utils.cleaning import store_location_map, category_map
 
 import json
 
