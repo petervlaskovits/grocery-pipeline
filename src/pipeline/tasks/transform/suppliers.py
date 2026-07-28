@@ -10,11 +10,11 @@ from pipeline.utils.cleaning import category_map, store_location_map, flags_map,
 from pipeline.utils.quality_checks import suppliers_schema, apply_schema
 
 @task(cache_policy=NO_CACHE)
-def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
+def clean_and_validate_suppliers(raw_df: DataFrame) -> DataFrame:
     """Cleans and validates the suppliers DataFrame.
 
     Args:
-        raw_suppliers_df (DataFrame): The raw suppliers DataFrame to be cleaned and validated.
+        raw_df (DataFrame): The raw suppliers DataFrame to be cleaned and validated.
 
     Returns:
         DataFrame: The cleand and validated suppliers DataFrame.
@@ -23,9 +23,9 @@ def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
     logger = get_run_logger()
     logger.info("Transforming suppliers table...")
 
-    before = raw_suppliers_df.count()
+    before = raw_df.count()
 
-    cleaned_qty_received = raw_suppliers_df.withColumn("qty_received", 
+    cleaned_qty_received = raw_df.withColumn("qty_received", 
         regexp_replace("qty_received", " units", "").try_cast(IntegerType())
     )
 
@@ -59,4 +59,4 @@ def clean_and_validate_suppliers(raw_suppliers_df: DataFrame) -> DataFrame:
         "after_transform_row_count": after
     })
 
-    return validated
+    return validated, validation_errors

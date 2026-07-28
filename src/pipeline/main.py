@@ -47,9 +47,9 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     logger = get_run_logger()
     logger.info("Beginning transformation process...")
 
-    cleaned_transactions_df = clean_and_validate_transactions(raw_dfs[0])
-    cleaned_suppliers_df = clean_and_validate_suppliers(raw_dfs[1])
-    cleaned_inventory_df = clean_and_validate_inventory(raw_dfs[2])
+    cleaned_transactions_df = clean_and_validate_transactions(raw_dfs[0])[0]
+    cleaned_suppliers_df = clean_and_validate_suppliers(raw_dfs[1])[0]
+    cleaned_inventory_df = clean_and_validate_inventory(raw_dfs[2])[0]
 
     logger.info("Finished transformation process")
     return [cleaned_transactions_df, cleaned_suppliers_df, cleaned_inventory_df]

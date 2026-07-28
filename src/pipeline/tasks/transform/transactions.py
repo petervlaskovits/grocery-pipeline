@@ -98,4 +98,4 @@ def clean_and_validate_transactions(raw_df: DataFrame) -> DataFrame:
         "after_transform_row_count": after
     }))
 
-    return validated
+    return validated, validation_errors
