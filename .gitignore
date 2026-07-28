@@ -12,3 +12,6 @@ wheels/
 
 # pipeline log files
 src/pipeline/tmp/
+
+# fixture generation folder
+tests/fixtures/tmp/
