@@ -1,13 +1,13 @@
 from prefect import flow, get_run_logger
 from pyspark.sql import SparkSession, DataFrame
 
-from tasks.extract import extract_table
+from pipeline.tasks.extract import extract_table
 
-from tasks.transform.inventory import clean_and_validate_inventory
-from tasks.transform.suppliers import clean_and_validate_suppliers
-from tasks.transform.transactions import clean_and_validate_transactions
+from pipeline.tasks.transform.inventory import clean_and_validate_inventory
+from pipeline.tasks.transform.suppliers import clean_and_validate_suppliers
+from pipeline.tasks.transform.transactions import clean_and_validate_transactions
 
-from tasks.load import load_dataframe_to_s3
+from pipeline.tasks.load import load_dataframe_to_s3
 
 import time
 
@@ -47,9 +47,9 @@ def transform(raw_dfs: list[DataFrame, DataFrame, DataFrame]) -> list[DataFrame,
     logger = get_run_logger()
     logger.info("Beginning transformation process...")
 
-    cleaned_transactions_df = clean_and_validate_transactions(raw_dfs[0])
-    cleaned_suppliers_df = clean_and_validate_suppliers(raw_dfs[1])
-    cleaned_inventory_df = clean_and_validate_inventory(raw_dfs[2])
+    cleaned_transactions_df = clean_and_validate_transactions(raw_dfs[0])[0]
+    cleaned_suppliers_df = clean_and_validate_suppliers(raw_dfs[1])[0]
+    cleaned_inventory_df = clean_and_validate_inventory(raw_dfs[2])[0]
 
     logger.info("Finished transformation process")
     return [cleaned_transactions_df, cleaned_suppliers_df, cleaned_inventory_df]

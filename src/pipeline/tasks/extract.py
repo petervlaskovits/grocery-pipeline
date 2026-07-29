@@ -33,8 +33,8 @@ def extract_table(table_name: str) -> DataFrame:
             url="jdbc:postgresql://localhost:5432/retail",
             table=table_name,
             properties={
-                "user": login_credentials["user"],
-                "password": login_credentials["password"],
+                "user": "postgres",
+                "password": "postgres",
             },
         )
         logger.info(f"Successfully extracted table {table_name}")

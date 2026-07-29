@@ -5,8 +5,8 @@ from prefect.cache_policies import NO_CACHE
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, when, try_to_date, try_to_timestamp
 
-from utils.cleaning import store_location_map, flags_map, category_map, uppercase_columns_for_mapping, map_lookup_to_df
-from utils.quality_checks import inventory_schema, apply_schema
+from pipeline.utils.cleaning import store_location_map, flags_map, category_map, uppercase_columns_for_mapping, map_lookup_to_df
+from pipeline.utils.quality_checks import inventory_schema, apply_schema
 
 @task(cache_policy=NO_CACHE)
 def clean_and_validate_inventory(raw_df: DataFrame) -> DataFrame:
@@ -59,4 +59,4 @@ def clean_and_validate_inventory(raw_df: DataFrame) -> DataFrame:
         "after_transform_row_count": after
     })
 
-    return validated
+    return validated, validation_errors
