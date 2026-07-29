@@ -12,6 +12,7 @@ You can check out the dashboard [here](https://peter-v-grocery-dashboard-project
 * Data validation - Pandera
 * Dashboard - Streamlit
 * Data warehouse - AWS Redshift
+* CI - GitHub Actions, PyTest
 
 ## Architecture Discussion
 
@@ -23,7 +24,7 @@ Since this pipeline would be running weekly, I opted for full load because the d
 
 I opted to use Spark for the transformation/cleaning layer instead of Pandas or Polars because this pipeline is intended to scale as the data volume increases, though there would have to be other changes to the pipeline in order to make this pipeline run smoothly as the data volume increases.
 
-After all of the data is cleaned, I used Pandera to validate all of the data in accordance to a schema defined by myself. This would eventually be used for CI/CD to test out any changes to the pipeline; however, since I was on a tight time constraint to finish up this project, I opted to not include it in the initial release of this project. That being said I plan on implementing CI/CD later.
+After all of the data is cleaned, I used Pandera to validate all of the data in accordance to a schema defined by myself. This would be used for some CI tests as detailed in the CI section.
 
 Once the data is validated, all of the cleaned tables are loaded locally as Parquet files to be uploaded into an S3 bucket, where it will be used for a Redshift warehouse. Initially, I tried using it natively by using AWS-specific JARs, however, it was incredibly tough to deal with, and I opted to just load the Parquet files locally and upload them into the S3 bucket. One limitation is that if the loading operation fails, then someone would have to manually upload the data into S3. If this project were to scale I would maybe create a loading "backfill" script that goes through the uploaded files and loads them into S3 if the data fails to be uploaded into S3 after a certain amount of time; I'll definitely have to research more into this topic to see what I should do in this situation. Another bottleneck that would likely occur if the data volume increases is the lack of partitioning in the Parquet files being uploaded to S3; it would slow the pipeline down significantly trying to upload all 10 million rows in a certain table all at once. To ensure the pipeline runs smoothly I would probably partition the tables by date per year because it may be used heavily by data analysts when working with analyticaly queries, but that would mean I would have to figure something out dealing with partitioned files and loading them to Redshift.
 
@@ -44,6 +45,11 @@ I used a star schema because it makes it easy for data analysts to be able to qu
 
 ### EDA 
 Before developing my pipeline, I did some exploratory data analysis on the data to see what data quality issues each table had so I can think about my strategy to transform each messy column within the tables. The EDA notebooks can be found in ``src/eda_notebooks``.
+
+### CI testing
+I used PyTest to create a few tests that tested out the transformations of each table to ensure that any changes to the pipeline's transformation logic doesn't mess up the final data model inside the Redshift warehouse. Additionally, I wrote other tests that tested out the mapping function as well to ensure that the mapping function was working properly. All of these tests are tested in a GitHub Actions workflow that tests any changes to the pipeline to simulate transformation behavior.
+
+While I could've include a CD part to create a CI/CD pipeline, I opted not to include it because I don't have a budget of a data team to be able to do so. It would mean maintaining a database on the cloud for my original data source and deploying my pipeline somewhere on an actual server (AWS EC2, Docker, Kubernetes, etc.). If I had a lot more money I would've moved my PostgreSQL source system to the cloud and would've deployed my pipeline on Docker somewhere on a cloud server.
 
 ## Project Setup
 To get started, use the Claude-generated script in ```src/sql_queries/generate_raw_retail_db.sql``` to generate the PostgreSQL database with all of the raw data.
@@ -72,7 +78,7 @@ Set these blocks up in the Prefect UI.
 
 Once the blocks are set up, create a Redshift cluster and use the data modelling queries in ```src/sql_queries/redshift/data_modelling``` to setup the data warehouse.
 
-After that, start the pipeline with 
+Finally, start the pipeline with 
 ```
-python3 src/pipeline/main.py
+uv run python -m pipeline.main
 ```
